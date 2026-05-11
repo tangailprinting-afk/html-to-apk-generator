@@ -7,15 +7,21 @@ const git = simpleGit();
 
 export async function POST(req: Request) {
 
-  const body = await req.json();
+  const formData = await req.formData();
 
-  const {
-    appName,
-    packageName,
-    htmlCode,
-  } = body;
+  const appName =
+    formData.get("appName") as string;
 
-  // Update HTML
+  const packageName =
+    formData.get("packageName") as string;
+
+  const htmlCode =
+    formData.get("htmlCode") as string;
+
+  const icon =
+    formData.get("icon") as File;
+
+  // Save HTML
 
   const indexPath = path.join(
     process.cwd(),
@@ -25,7 +31,26 @@ export async function POST(req: Request) {
 
   fs.writeFileSync(indexPath, htmlCode);
 
-  // Update App Name
+  // Save Icon
+
+  if (icon) {
+
+    const bytes =
+      await icon.arrayBuffer();
+
+    const buffer =
+      Buffer.from(bytes);
+
+    const iconPath = path.join(
+      process.cwd(),
+      "resources",
+      "icon.png"
+    );
+
+    fs.writeFileSync(iconPath, buffer);
+  }
+
+  // Update strings.xml
 
   const stringsPath = path.join(
     process.cwd(),
@@ -47,11 +72,43 @@ export async function POST(req: Request) {
 
   fs.writeFileSync(stringsPath, stringsContent);
 
+  // Update build.gradle
+
+  const gradlePath = path.join(
+    process.cwd(),
+    "android",
+    "app",
+    "build.gradle"
+  );
+
+  let gradleContent =
+    fs.readFileSync(gradlePath, "utf8");
+
+  gradleContent = gradleContent.replace(
+    /applicationId\s+"[^"]+"/,
+    `applicationId "${packageName}"`
+  );
+
+  fs.writeFileSync(
+    gradlePath,
+    gradleContent
+  );
+
+  // Generate Assets
+
+  const { execSync } = require("child_process");
+
+  execSync("npx capacitor-assets generate");
+
+  // Git Push
+
   await git.add("./*");
 
   await git.commit("updated dynamic app");
 
   await git.push("origin", "main");
+
+  // Trigger Workflow
 
   await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/workflows/android.yml/dispatches`,
@@ -69,9 +126,13 @@ export async function POST(req: Request) {
     }
   );
 
+  // Wait
+
   await new Promise((resolve) =>
     setTimeout(resolve, 20000)
   );
+
+  // Get Artifacts
 
   const artifactsResponse = await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,

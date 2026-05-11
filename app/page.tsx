@@ -8,21 +8,23 @@ export default function Home() {
   const [packageName, setPackageName] = useState("");
   const [htmlCode, setHtmlCode] = useState("");
   const [downloadLink, setDownloadLink] = useState("");
+  const [icon, setIcon] = useState<File | null>(null);
 
   const generateAPK = async () => {
 
+    const formData = new FormData();
+
+    formData.append("appName", appName);
+    formData.append("packageName", packageName);
+    formData.append("htmlCode", htmlCode);
+
+    if (icon) {
+      formData.append("icon", icon);
+    }
+
     const response = await fetch("/api/generate", {
       method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        appName,
-        packageName,
-        htmlCode,
-      }),
+      body: formData,
     });
 
     const data = await response.json();
@@ -73,6 +75,17 @@ export default function Home() {
           onChange={(e) =>
             setHtmlCode(e.target.value)
           }
+        />
+
+        <input
+          type="file"
+          accept="image/png"
+          onChange={(e) => {
+            if (e.target.files?.[0]) {
+              setIcon(e.target.files[0]);
+            }
+          }}
+          className="p-4 rounded-xl bg-zinc-800 text-white"
         />
 
         <button
