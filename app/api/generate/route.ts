@@ -21,17 +21,20 @@ export async function POST(req: Request) {
   const icon =
     formData.get("icon") as File;
 
-  // Update public/index.html
+  // SAVE APP HTML
 
-  const indexPath = path.join(
+  const htmlPath = path.join(
     process.cwd(),
     "public",
-    "index.html"
+    "app.html"
   );
 
-  fs.writeFileSync(indexPath, htmlCode);
+  fs.writeFileSync(
+    htmlPath,
+    htmlCode
+  );
 
-  // Save Icon
+  // SAVE ICON
 
   if (icon) {
 
@@ -47,10 +50,13 @@ export async function POST(req: Request) {
       "icon.png"
     );
 
-    fs.writeFileSync(iconPath, buffer);
+    fs.writeFileSync(
+      iconPath,
+      buffer
+    );
   }
 
-  // Update strings.xml
+  // UPDATE APP NAME
 
   const stringsPath = path.join(
     process.cwd(),
@@ -65,13 +71,16 @@ export async function POST(req: Request) {
 
   const stringsContent = `<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">${appName}</string>
-    <string name="title_activity_main">${appName}</string>
+<string name="app_name">${appName}</string>
+<string name="title_activity_main">${appName}</string>
 </resources>`;
 
-  fs.writeFileSync(stringsPath, stringsContent);
+  fs.writeFileSync(
+    stringsPath,
+    stringsContent
+  );
 
-  // Update build.gradle
+  // UPDATE PACKAGE NAME
 
   const gradlePath = path.join(
     process.cwd(),
@@ -81,19 +90,47 @@ export async function POST(req: Request) {
   );
 
   let gradleContent =
-    fs.readFileSync(gradlePath, "utf8");
+    fs.readFileSync(
+      gradlePath,
+      "utf8"
+    );
 
-  gradleContent = gradleContent.replace(
-    /applicationId\s+"[^"]+"/,
-    `applicationId "${packageName}"`
-  );
+  gradleContent =
+    gradleContent.replace(
+      /applicationId\s+"[^"]+"/,
+      `applicationId "${packageName}"`
+    );
 
   fs.writeFileSync(
     gradlePath,
     gradleContent
   );
 
-  // Generate Android Assets
+  // UPDATE CAPACITOR CONFIG
+
+  const capacitorPath = path.join(
+    process.cwd(),
+    "capacitor.config.ts"
+  );
+
+  const capacitorContent = `
+import type { CapacitorConfig } from "@capacitor/cli";
+
+const config: CapacitorConfig = {
+  appId: "${packageName}",
+  appName: "${appName}",
+  webDir: "out",
+};
+
+export default config;
+`;
+
+  fs.writeFileSync(
+    capacitorPath,
+    capacitorContent
+  );
+
+  // GENERATE ICONS
 
   const { execSync } =
     require("child_process");
@@ -102,15 +139,20 @@ export async function POST(req: Request) {
     "npx capacitor-assets generate"
   );
 
-  // Git Push
+  // PUSH TO GITHUB
 
   await git.add("./*");
 
-  await git.commit("updated dynamic app");
+  await git.commit(
+    "updated dynamic apk"
+  );
 
-  await git.push("origin", "main");
+  await git.push(
+    "origin",
+    "main"
+  );
 
-  // Trigger Workflow
+  // RUN GITHUB ACTION
 
   await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/workflows/android.yml/dispatches`,
@@ -118,8 +160,11 @@ export async function POST(req: Request) {
       method: "POST",
 
       headers: {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-        Accept: "application/vnd.github+json",
+        Authorization:
+          `Bearer ${process.env.GITHUB_TOKEN}`,
+
+        Accept:
+          "application/vnd.github+json",
       },
 
       body: JSON.stringify({
@@ -128,30 +173,31 @@ export async function POST(req: Request) {
     }
   );
 
-  // Wait for build
+  // WAIT BUILD
 
   await new Promise((resolve) =>
-    setTimeout(resolve, 20000)
+    setTimeout(resolve, 30000)
   );
 
-  // Get Artifacts
+  // GET APK ARTIFACT
 
-  const artifactsResponse = await fetch(
-    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-        Accept: "application/vnd.github+json",
-      },
-    }
-  );
+  const artifactResponse =
+    await fetch(
+      `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,
+      {
+        headers: {
+          Authorization:
+            `Bearer ${process.env.GITHUB_TOKEN}`,
+        },
+      }
+    );
 
-  const artifactsData =
-    await artifactsResponse.json();
+  const artifactData =
+    await artifactResponse.json();
 
   return NextResponse.json({
     success: true,
-    artifact: artifactsData,
+    artifact: artifactData,
   });
 
 }

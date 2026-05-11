@@ -1,8 +1,9 @@
+
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.htmlapk.generator",
-  appName: "HTML APK Generator",
+  appId: "com.fatiha.app",
+  appName: "Fatiha",
   webDir: "out",
 };
 
