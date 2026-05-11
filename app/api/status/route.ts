@@ -15,8 +15,6 @@ export async function GET(req: Request) {
         headers: {
           Authorization:
             `Bearer ${process.env.GITHUB_TOKEN}`,
-          Accept:
-            "application/vnd.github+json",
         },
       }
     );
@@ -24,43 +22,21 @@ export async function GET(req: Request) {
   const data =
     await response.json();
 
-  // BUILD STATUS
-
   if (
     data.status !==
     "completed"
   ) {
 
     return NextResponse.json({
-      status:
-        data.status,
+      status: data.status,
     });
   }
-
-  // GET ARTIFACTS
-
-  const artifactResponse =
-    await fetch(
-      data.artifacts_url,
-      {
-        headers: {
-          Authorization:
-            `Bearer ${process.env.GITHUB_TOKEN}`,
-        },
-      }
-    );
-
-  const artifactData =
-    await artifactResponse.json();
-
-  const artifact =
-    artifactData.artifacts?.[0];
 
   return NextResponse.json({
     status: "completed",
 
     downloadUrl:
-      artifact.archive_download_url,
+      `https://github.com/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/releases/download/apk-release/app-debug.apk`,
   });
 
 }

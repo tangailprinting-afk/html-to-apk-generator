@@ -22,13 +22,10 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
 
       - name: Install Dependencies
         run: npm install
-
-      - name: Build Next.js
-        run: npm run build
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -39,8 +36,14 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-release
+          files: android/app/build/outputs/apk/debug/app-debug.apk
