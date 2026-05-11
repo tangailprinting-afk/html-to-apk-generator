@@ -41,9 +41,22 @@ export async function POST(req: Request) {
     }
   );
 
+  const runsResponse = await fetch(
+    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/runs`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        Accept: "application/vnd.github+json",
+      },
+    }
+  );
+
+  const runsData = await runsResponse.json();
+
   return NextResponse.json({
     success: true,
-    message: "Dynamic APK Build Started",
+    message: "APK Build Started",
+    runs: runsData,
   });
 
 }
