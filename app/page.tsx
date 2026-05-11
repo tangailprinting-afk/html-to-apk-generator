@@ -7,11 +7,13 @@ export default function Home() {
   const [appName, setAppName] = useState("");
   const [packageName, setPackageName] = useState("");
   const [htmlCode, setHtmlCode] = useState("");
+  const [downloadLink, setDownloadLink] = useState("");
 
   const generateAPK = async () => {
 
     const response = await fetch("/api/generate", {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
       },
@@ -25,55 +27,72 @@ export default function Home() {
 
     const data = await response.json();
 
-    console.log(data);
+    const artifact =
+      data.artifact.artifacts[0];
 
-    alert(data.message);
+    setDownloadLink(
+      artifact.archive_download_url
+    );
 
+    alert("APK Build Completed");
   };
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center p-5">
-      
-      <div className="w-full max-w-2xl bg-zinc-900 p-6 rounded-2xl">
+    <main className="min-h-screen bg-black flex items-center justify-center">
 
-        <h1 className="text-3xl font-bold text-center mb-6">
+      <div className="bg-zinc-900 p-8 rounded-2xl w-[400px] flex flex-col gap-4">
+
+        <h1 className="text-white text-4xl font-bold text-center">
           HTML To APK Generator
         </h1>
 
-        <div className="space-y-4">
+        <input
+          type="text"
+          placeholder="App Name"
+          className="p-4 rounded-xl bg-zinc-800 text-white"
+          value={appName}
+          onChange={(e) =>
+            setAppName(e.target.value)
+          }
+        />
 
-          <input
-            type="text"
-            placeholder="App Name"
-            value={appName}
-            onChange={(e) => setAppName(e.target.value)}
-            className="w-full p-3 rounded-xl bg-zinc-800 outline-none"
-          />
+        <input
+          type="text"
+          placeholder="Package Name"
+          className="p-4 rounded-xl bg-zinc-800 text-white"
+          value={packageName}
+          onChange={(e) =>
+            setPackageName(e.target.value)
+          }
+        />
 
-          <input
-            type="text"
-            placeholder="Package Name"
-            value={packageName}
-            onChange={(e) => setPackageName(e.target.value)}
-            className="w-full p-3 rounded-xl bg-zinc-800 outline-none"
-          />
+        <textarea
+          placeholder="Paste HTML Code"
+          className="p-4 rounded-xl bg-zinc-800 text-white h-60"
+          value={htmlCode}
+          onChange={(e) =>
+            setHtmlCode(e.target.value)
+          }
+        />
 
-          <textarea
-            placeholder="Paste HTML Code"
-            rows={10}
-            value={htmlCode}
-            onChange={(e) => setHtmlCode(e.target.value)}
-            className="w-full p-3 rounded-xl bg-zinc-800 outline-none"
-          />
+        <button
+          onClick={generateAPK}
+          className="bg-green-500 text-white p-4 rounded-xl font-bold"
+        >
+          Generate APK
+        </button>
 
-          <button
-            onClick={generateAPK}
-            className="w-full bg-green-500 hover:bg-green-600 p-3 rounded-xl font-bold"
+        {downloadLink && (
+
+          <a
+            href={downloadLink}
+            target="_blank"
+            className="bg-blue-500 text-white p-4 rounded-xl text-center font-bold"
           >
-            Generate APK
-          </button>
+            Download APK
+          </a>
 
-        </div>
+        )}
 
       </div>
 
