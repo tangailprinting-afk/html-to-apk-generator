@@ -4,61 +4,125 @@ import { useState } from "react";
 
 export default function Home() {
 
-  const [appName, setAppName] = useState("");
-  const [packageName, setPackageName] = useState("");
-  const [htmlCode, setHtmlCode] = useState("");
-  const [downloadLink, setDownloadLink] = useState("");
-  const [icon, setIcon] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [appName, setAppName] =
+    useState("");
+
+  const [packageName, setPackageName] =
+    useState("");
+
+  const [htmlCode, setHtmlCode] =
+    useState("");
+
+  const [downloadLink, setDownloadLink] =
+    useState("");
+
+  const [icon, setIcon] =
+    useState<File | null>(null);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [status, setStatus] =
+    useState("");
 
   const generateAPK = async () => {
 
-    if (!appName || !packageName || !htmlCode) {
+    if (
+      !appName ||
+      !packageName ||
+      !htmlCode
+    ) {
       alert("সব তথ্য পূরণ করুন");
       return;
     }
 
     setLoading(true);
 
+    setDownloadLink("");
+
+    setStatus("Uploading Files...");
+
     const formData = new FormData();
 
-    formData.append("appName", appName);
-    formData.append("packageName", packageName);
-    formData.append("htmlCode", htmlCode);
+    formData.append(
+      "appName",
+      appName
+    );
+
+    formData.append(
+      "packageName",
+      packageName
+    );
+
+    formData.append(
+      "htmlCode",
+      htmlCode
+    );
 
     if (icon) {
       formData.append("icon", icon);
     }
 
-    try {
+    setStatus("Updating App Config...");
 
-      const response = await fetch(
-        "/api/generate",
-        {
-          method: "POST",
-          body: formData,
-        }
+    const response = await fetch(
+      "/api/generate",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data =
+      await response.json();
+
+    const runId =
+      data.runId;
+
+    setStatus(
+      "Starting Cloud Build..."
+    );
+
+    // WAIT BUILD
+
+    let completed = false;
+
+    while (!completed) {
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 5000)
       );
 
-      const data = await response.json();
-
-      const artifact =
-        data.artifact.artifacts[0];
-
-      setDownloadLink(
-        artifact.archive_download_url
+      setStatus(
+        "Building APK... Please wait 2-3 minutes..."
       );
 
-      alert("APK Successfully Generated");
+      const statusResponse =
+        await fetch(
+          `/api/status?runId=${runId}`
+        );
 
-    } catch (error) {
+      const statusData =
+        await statusResponse.json();
 
-      alert("Build Failed");
+      if (
+        statusData.status ===
+        "completed"
+      ) {
 
+        completed = true;
+
+        setStatus(
+          "APK Ready"
+        );
+
+        setDownloadLink(
+          statusData.downloadUrl
+        );
+
+        setLoading(false);
+      }
     }
-
-    setLoading(false);
-
   };
 
   return (
@@ -74,7 +138,7 @@ export default function Home() {
           </h1>
 
           <p className="text-zinc-400 text-lg">
-            Convert HTML Code into Android APK
+            Convert HTML into Android APK
           </p>
 
         </div>
@@ -86,42 +150,54 @@ export default function Home() {
             placeholder="App Name"
             value={appName}
             onChange={(e) =>
-              setAppName(e.target.value)
+              setAppName(
+                e.target.value
+              )
             }
-            className="w-full bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl outline-none focus:border-green-500"
+            className="w-full bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl"
           />
 
           <input
             type="text"
-            placeholder="Package Name (com.example.app)"
+            placeholder="Package Name"
             value={packageName}
             onChange={(e) =>
-              setPackageName(e.target.value)
+              setPackageName(
+                e.target.value
+              )
             }
-            className="w-full bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl outline-none focus:border-green-500"
+            className="w-full bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl"
           />
 
           <textarea
-            placeholder="Paste Your HTML Code"
+            placeholder="Paste HTML Code"
             value={htmlCode}
             onChange={(e) =>
-              setHtmlCode(e.target.value)
+              setHtmlCode(
+                e.target.value
+              )
             }
-            className="w-full h-80 bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl outline-none focus:border-green-500"
+            className="w-full h-80 bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl"
           />
 
           <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-5">
 
             <p className="text-white font-bold mb-3">
-              Upload App Icon (PNG)
+              Upload App Icon
             </p>
 
             <input
               type="file"
               accept="image/png"
               onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  setIcon(e.target.files[0]);
+
+                if (
+                  e.target.files?.[0]
+                ) {
+
+                  setIcon(
+                    e.target.files[0]
+                  );
                 }
               }}
               className="text-white"
@@ -136,10 +212,22 @@ export default function Home() {
           >
 
             {loading
-              ? "Building APK..."
+              ? "Processing..."
               : "Generate APK"}
 
           </button>
+
+          {status && (
+
+            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-5 text-center">
+
+              <p className="text-white text-lg font-bold">
+                {status}
+              </p>
+
+            </div>
+
+          )}
 
           {downloadLink && (
 

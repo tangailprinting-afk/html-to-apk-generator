@@ -2,8 +2,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.mim.app",
-  appName: "mim",
+  appId: "com.mina.app",
+  appName: "mina",
   webDir: "out",
 };
 
