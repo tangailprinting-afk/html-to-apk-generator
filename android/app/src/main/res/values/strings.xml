@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Rabbi</string>
-    <string name="title_activity_main">Rabbi</string>
-    <string name="package_name">com.rabbi.app</string>
+    <string name="app_name">rabbi</string>
+    <string name="title_activity_main">rabbi</string>
 </resources>
