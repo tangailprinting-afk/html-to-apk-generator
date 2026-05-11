@@ -154,6 +154,8 @@ export default config;
 
   // RUN GITHUB ACTION
 
+ 
+const workflowResponse =
   await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/workflows/android.yml/dispatches`,
     {
@@ -172,6 +174,38 @@ export default config;
       }),
     }
   );
+
+// WAIT A LITTLE
+
+await new Promise((resolve) =>
+  setTimeout(resolve, 5000)
+);
+
+// GET LATEST RUN
+
+const runsResponse =
+  await fetch(
+    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/runs`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${process.env.GITHUB_TOKEN}`,
+      },
+    }
+  );
+
+const runsData =
+  await runsResponse.json();
+
+const latestRun =
+  runsData.workflow_runs[0];
+
+
+
+
+
+
+
 
   // WAIT BUILD
 
@@ -195,9 +229,9 @@ export default config;
   const artifactData =
     await artifactResponse.json();
 
-  return NextResponse.json({
-    success: true,
-    artifact: artifactData,
-  });
+return NextResponse.json({
+  success: true,
+  runId: latestRun.id,
+});
 
 }
