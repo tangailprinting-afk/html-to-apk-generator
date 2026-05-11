@@ -9,7 +9,13 @@ export async function POST(req: Request) {
 
   const body = await req.json();
 
-  const { htmlCode } = body;
+  const {
+    appName,
+    packageName,
+    htmlCode,
+  } = body;
+
+  // Update HTML
 
   const indexPath = path.join(
     process.cwd(),
@@ -19,9 +25,31 @@ export async function POST(req: Request) {
 
   fs.writeFileSync(indexPath, htmlCode);
 
+  // Update App Name
+
+  const stringsPath = path.join(
+    process.cwd(),
+    "android",
+    "app",
+    "src",
+    "main",
+    "res",
+    "values",
+    "strings.xml"
+  );
+
+  const stringsContent = `<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">${appName}</string>
+    <string name="title_activity_main">${appName}</string>
+    <string name="package_name">${packageName}</string>
+</resources>`;
+
+  fs.writeFileSync(stringsPath, stringsContent);
+
   await git.add("./*");
 
-  await git.commit("updated dynamic html");
+  await git.commit("updated dynamic app");
 
   await git.push("origin", "main");
 
@@ -41,7 +69,9 @@ export async function POST(req: Request) {
     }
   );
 
-  await new Promise((resolve) => setTimeout(resolve, 20000));
+  await new Promise((resolve) =>
+    setTimeout(resolve, 20000)
+  );
 
   const artifactsResponse = await fetch(
     `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,
@@ -53,7 +83,8 @@ export async function POST(req: Request) {
     }
   );
 
-  const artifactsData = await artifactsResponse.json();
+  const artifactsData =
+    await artifactsResponse.json();
 
   return NextResponse.json({
     success: true,
