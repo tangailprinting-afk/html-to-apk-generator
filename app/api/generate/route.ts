@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const icon =
     formData.get("icon") as File;
 
-  // Save HTML
+  // Update public/index.html
 
   const indexPath = path.join(
     process.cwd(),
@@ -67,7 +67,6 @@ export async function POST(req: Request) {
 <resources>
     <string name="app_name">${appName}</string>
     <string name="title_activity_main">${appName}</string>
-    <string name="package_name">${packageName}</string>
 </resources>`;
 
   fs.writeFileSync(stringsPath, stringsContent);
@@ -94,11 +93,14 @@ export async function POST(req: Request) {
     gradleContent
   );
 
-  // Generate Assets
+  // Generate Android Assets
 
-  const { execSync } = require("child_process");
+  const { execSync } =
+    require("child_process");
 
-  execSync("npx capacitor-assets generate");
+  execSync(
+    "npx capacitor-assets generate"
+  );
 
   // Git Push
 
@@ -126,7 +128,7 @@ export async function POST(req: Request) {
     }
   );
 
-  // Wait
+  // Wait for build
 
   await new Promise((resolve) =>
     setTimeout(resolve, 20000)
