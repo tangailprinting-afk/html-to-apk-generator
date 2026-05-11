@@ -41,8 +41,10 @@ export async function POST(req: Request) {
     }
   );
 
-  const runsResponse = await fetch(
-    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/runs`,
+  await new Promise((resolve) => setTimeout(resolve, 20000));
+
+  const artifactsResponse = await fetch(
+    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,
     {
       headers: {
         Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
@@ -51,12 +53,11 @@ export async function POST(req: Request) {
     }
   );
 
-  const runsData = await runsResponse.json();
+  const artifactsData = await artifactsResponse.json();
 
   return NextResponse.json({
     success: true,
-    message: "APK Build Started",
-    runs: runsData,
+    artifact: artifactsData,
   });
 
 }
