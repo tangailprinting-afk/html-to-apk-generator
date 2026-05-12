@@ -4,7 +4,7 @@ android {
     namespace "com.htmlapk.generator"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.habib.app"
+        applicationId "com.mimali.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
