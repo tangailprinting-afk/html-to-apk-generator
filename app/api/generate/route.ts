@@ -1,237 +1,198 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-import simpleGit from "simple-git";
 
-const git = simpleGit();
+import {
+  updateGitHubFile,
+  triggerWorkflow,
+} from "@/lib/github";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+) {
 
-  const formData = await req.formData();
+  try {
 
-  const appName =
-    formData.get("appName") as string;
+    const formData =
+      await req.formData();
 
-  const packageName =
-    formData.get("packageName") as string;
+    const appName =
+      formData.get(
+        "appName"
+      ) as string;
 
-  const htmlCode =
-    formData.get("htmlCode") as string;
+    const packageName =
+      formData.get(
+        "packageName"
+      ) as string;
 
-  const icon =
-    formData.get("icon") as File;
+    const htmlCode =
+      formData.get(
+        "htmlCode"
+      ) as string;
 
-  // SAVE APP HTML
+    const icon =
+      formData.get(
+        "icon"
+      ) as File;
 
-  const htmlPath = path.join(
-    process.cwd(),
-    "public",
-    "app.html"
-  );
+    // VALIDATE PACKAGE
 
-  fs.writeFileSync(
-    htmlPath,
-    htmlCode
-  );
+    const validPackage =
+      /^[a-z]+\.[a-z0-9]+\.[a-z0-9]+$/;
 
-  // SAVE ICON
+    if (
+      !validPackage.test(
+        packageName
+      )
+    ) {
 
-  if (icon) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Invalid package name",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
-    const bytes =
-      await icon.arrayBuffer();
+    // UPDATE HTML
 
-    const buffer =
-      Buffer.from(bytes);
-
-    const iconPath = path.join(
-      process.cwd(),
-      "resources",
-      "icon.png"
+    await updateGitHubFile(
+      "public/app.html",
+      htmlCode,
+      "updated html"
     );
 
-    fs.writeFileSync(
-      iconPath,
-      buffer
-    );
-  }
+    // UPDATE ICON
 
-  // UPDATE APP NAME
+    if (icon) {
 
-  const stringsPath = path.join(
-    process.cwd(),
-    "android",
-    "app",
-    "src",
-    "main",
-    "res",
-    "values",
-    "strings.xml"
-  );
+      const bytes =
+        await icon.arrayBuffer();
 
-  const stringsContent = `<?xml version='1.0' encoding='utf-8'?>
+      const base64 =
+        Buffer.from(
+          bytes
+        ).toString("base64");
+
+      await fetch(
+        `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/resources/icon.png`,
+        {
+          method: "PUT",
+
+          headers: {
+            Authorization:
+              `Bearer ${process.env.GITHUB_TOKEN}`,
+            Accept:
+              "application/vnd.github+json",
+          },
+
+          body: JSON.stringify({
+            message:
+              "updated icon",
+
+            content:
+              base64,
+          }),
+        }
+      );
+    }
+
+    // UPDATE STRINGS
+
+    const strings =
+      `<?xml version='1.0' encoding='utf-8'?>
 <resources>
 <string name="app_name">${appName}</string>
 <string name="title_activity_main">${appName}</string>
 </resources>`;
 
-  fs.writeFileSync(
-    stringsPath,
-    stringsContent
-  );
-
-  // UPDATE PACKAGE NAME
-
-  const gradlePath = path.join(
-    process.cwd(),
-    "android",
-    "app",
-    "build.gradle"
-  );
-
-  let gradleContent =
-    fs.readFileSync(
-      gradlePath,
-      "utf8"
+    await updateGitHubFile(
+      "android/app/src/main/res/values/strings.xml",
+      strings,
+      "updated strings"
     );
 
-  gradleContent =
-    gradleContent.replace(
-      /applicationId\s+"[^"]+"/,
-      `applicationId "${packageName}"`
+    // UPDATE GRADLE
+
+    const gradleResponse =
+      await fetch(
+        `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/android/app/build.gradle`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${process.env.GITHUB_TOKEN}`,
+          },
+        }
+      );
+
+    const gradleData =
+      await gradleResponse.json();
+
+    const gradleContent =
+      Buffer.from(
+        gradleData.content,
+        "base64"
+      ).toString("utf8");
+
+    const updatedGradle =
+      gradleContent.replace(
+        /applicationId\s+"[^"]+"/,
+        `applicationId "${packageName}"`
+      );
+
+    await updateGitHubFile(
+      "android/app/build.gradle",
+      updatedGradle,
+      "updated package"
     );
 
-  fs.writeFileSync(
-    gradlePath,
-    gradleContent
-  );
+    // UPDATE CAPACITOR
 
-  // UPDATE CAPACITOR CONFIG
-
-  const capacitorPath = path.join(
-    process.cwd(),
-    "capacitor.config.ts"
-  );
-
-  const capacitorContent = `
+    const capacitorConfig =
+      `
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "${packageName}",
   appName: "${appName}",
- webDir: "public",
+  webDir: "public",
 };
 
 export default config;
 `;
 
-  fs.writeFileSync(
-    capacitorPath,
-    capacitorContent
-  );
-
-  // GENERATE ICONS
-
-  const { execSync } =
-    require("child_process");
-
-  execSync(
-    "npx capacitor-assets generate"
-  );
-
-  // PUSH TO GITHUB
-
-  await git.add("./*");
-
-  await git.commit(
-    "updated dynamic apk"
-  );
-
-  await git.push(
-    "origin",
-    "main"
-  );
-
-  // RUN GITHUB ACTION
-
- 
-const workflowResponse =
-  await fetch(
-    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/workflows/android.yml/dispatches`,
-    {
-      method: "POST",
-
-      headers: {
-        Authorization:
-          `Bearer ${process.env.GITHUB_TOKEN}`,
-
-        Accept:
-          "application/vnd.github+json",
-      },
-
-      body: JSON.stringify({
-        ref: "main",
-      }),
-    }
-  );
-
-// WAIT A LITTLE
-
-await new Promise((resolve) =>
-  setTimeout(resolve, 5000)
-);
-
-// GET LATEST RUN
-
-const runsResponse =
-  await fetch(
-    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/runs`,
-    {
-      headers: {
-        Authorization:
-          `Bearer ${process.env.GITHUB_TOKEN}`,
-      },
-    }
-  );
-
-const runsData =
-  await runsResponse.json();
-
-const latestRun =
-  runsData.workflow_runs[0];
-
-
-
-
-
-
-
-
-  // WAIT BUILD
-
-  await new Promise((resolve) =>
-    setTimeout(resolve, 30000)
-  );
-
-  // GET APK ARTIFACT
-
-  const artifactResponse =
-    await fetch(
-      `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/artifacts`,
-      {
-        headers: {
-          Authorization:
-            `Bearer ${process.env.GITHUB_TOKEN}`,
-        },
-      }
+    await updateGitHubFile(
+      "capacitor.config.ts",
+      capacitorConfig,
+      "updated capacitor"
     );
 
-  const artifactData =
-    await artifactResponse.json();
+    // START BUILD
 
-return NextResponse.json({
-  success: true,
-  runId: latestRun.id,
-});
+    const runId =
+      await triggerWorkflow();
 
+    return NextResponse.json({
+      success: true,
+      runId,
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          "Build failed",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }

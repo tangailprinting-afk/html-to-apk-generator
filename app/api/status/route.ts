@@ -1,42 +1,102 @@
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+import {
+  getWorkflowStatus,
+} from "@/lib/github";
 
-  const { searchParams } =
-    new URL(req.url);
+export async function GET(
+  req: Request
+) {
 
-  const runId =
-    searchParams.get("runId");
+  try {
 
-  const response =
-    await fetch(
-      `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/runs/${runId}`,
-      {
-        headers: {
-          Authorization:
-            `Bearer ${process.env.GITHUB_TOKEN}`,
+    const { searchParams } =
+      new URL(req.url);
+
+    const runId =
+      searchParams.get(
+        "runId"
+      );
+
+    if (!runId) {
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Missing runId",
         },
-      }
-    );
+        {
+          status: 400,
+        }
+      );
+    }
 
-  const data =
-    await response.json();
+    const data =
+      await getWorkflowStatus(
+        runId
+      );
 
-  if (
-    data.status !==
-    "completed"
-  ) {
+    // BUILDING
+
+    if (
+      data.status ===
+      "queued"
+    ) {
+
+      return NextResponse.json({
+        status:
+          "queued",
+      });
+    }
+
+    if (
+      data.status ===
+      "in_progress"
+    ) {
+
+      return NextResponse.json({
+        status:
+          "building",
+      });
+    }
+
+    // FAILED
+
+    if (
+      data.conclusion ===
+      "failure"
+    ) {
+
+      return NextResponse.json({
+        status:
+          "failed",
+      });
+    }
+
+    // SUCCESS
 
     return NextResponse.json({
-      status: data.status,
+      status:
+        "completed",
+
+      downloadUrl:
+        `https://github.com/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/releases/download/apk-release/app-debug.apk`,
     });
+
+  } catch (error) {
+
+    console.log(error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          "Status failed",
+      },
+      {
+        status: 500,
+      }
+    );
   }
-
-  return NextResponse.json({
-    status: "completed",
-
-    downloadUrl:
-      `https://github.com/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/releases/download/apk-release/app-debug.apk`,
-  });
-
 }

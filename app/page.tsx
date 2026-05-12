@@ -7,17 +7,21 @@ export default function Home() {
   const [appName, setAppName] =
     useState("");
 
-  const [packageName, setPackageName] =
-    useState("");
+  const [
+    packageName,
+    setPackageName,
+  ] = useState("");
 
   const [htmlCode, setHtmlCode] =
     useState("");
 
-  const [downloadLink, setDownloadLink] =
-    useState("");
-
   const [icon, setIcon] =
     useState<File | null>(null);
+
+  const [
+    downloadLink,
+    setDownloadLink,
+  ] = useState("");
 
   const [loading, setLoading] =
     useState(false);
@@ -25,228 +29,276 @@ export default function Home() {
   const [status, setStatus] =
     useState("");
 
-  const generateAPK = async () => {
+  const generateAPK =
+    async () => {
 
-    if (
-      !appName ||
-      !packageName ||
-      !htmlCode
-    ) {
-      alert("সব তথ্য পূরণ করুন");
-      return;
-    }
+      try {
 
-    setLoading(true);
-
-    setDownloadLink("");
-
-    setStatus("Uploading Files...");
-
-    const formData = new FormData();
-
-    formData.append(
-      "appName",
-      appName
-    );
-
-    formData.append(
-      "packageName",
-      packageName
-    );
-
-    formData.append(
-      "htmlCode",
-      htmlCode
-    );
-
-    if (icon) {
-      formData.append("icon", icon);
-    }
-
-    setStatus("Updating App Config...");
-
-    const response = await fetch(
-      "/api/generate",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    const data =
-      await response.json();
-
-    const runId =
-      data.runId;
-
-    setStatus(
-      "Starting Cloud Build..."
-    );
-
-    // WAIT BUILD
-
-    let completed = false;
-
-    while (!completed) {
-
-      await new Promise((resolve) =>
-        setTimeout(resolve, 5000)
-      );
-
-      setStatus(
-        "Building APK... Please wait 2-3 minutes..."
-      );
-
-      const statusResponse =
-        await fetch(
-          `/api/status?runId=${runId}`
-        );
-
-      const statusData =
-        await statusResponse.json();
-
-      if (
-        statusData.status ===
-        "completed"
-      ) {
-
-        completed = true;
+        setLoading(true);
 
         setStatus(
-          "APK Ready"
+          "Uploading Files..."
         );
 
-        setDownloadLink(
-          statusData.downloadUrl
+        const formData =
+          new FormData();
+
+        formData.append(
+          "appName",
+          appName
+        );
+
+        formData.append(
+          "packageName",
+          packageName
+        );
+
+        formData.append(
+          "htmlCode",
+          htmlCode
+        );
+
+        if (icon) {
+
+          formData.append(
+            "icon",
+            icon
+          );
+        }
+
+        const response =
+          await fetch(
+            "/api/generate",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!data.success) {
+
+          alert(
+            data.error
+          );
+
+          setLoading(false);
+
+          return;
+        }
+
+        const runId =
+          data.runId;
+
+        setStatus(
+          "Starting Cloud Build..."
+        );
+
+        let completed =
+          false;
+
+        while (!completed) {
+
+          await new Promise(
+            (resolve) =>
+              setTimeout(
+                resolve,
+                5000
+              )
+          );
+
+          const statusResponse =
+            await fetch(
+              `/api/status?runId=${runId}`
+            );
+
+          const statusData =
+            await statusResponse.json();
+
+          // QUEUED
+
+          if (
+            statusData.status ===
+            "queued"
+          ) {
+
+            setStatus(
+              "Build Queued..."
+            );
+
+            continue;
+          }
+
+          // BUILDING
+
+          if (
+            statusData.status ===
+            "building"
+          ) {
+
+            setStatus(
+              "Building APK... Please wait 2-3 minutes..."
+            );
+
+            continue;
+          }
+
+          // FAILED
+
+          if (
+            statusData.status ===
+            "failed"
+          ) {
+
+            alert(
+              "APK Build Failed"
+            );
+
+            setLoading(false);
+
+            return;
+          }
+
+          // SUCCESS
+
+          if (
+            statusData.status ===
+            "completed"
+          ) {
+
+            setStatus(
+              "APK Ready"
+            );
+
+            setDownloadLink(
+              statusData.downloadUrl
+            );
+
+            completed =
+              true;
+          }
+        }
+
+        setLoading(false);
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          "Something went wrong"
         );
 
         setLoading(false);
       }
-    }
-  };
+    };
 
   return (
 
-    <main className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black flex items-center justify-center p-5">
+    <main className="min-h-screen bg-black flex items-center justify-center p-5">
 
-      <div className="w-full max-w-3xl bg-zinc-900/80 border border-zinc-800 rounded-3xl shadow-2xl p-8">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 w-full max-w-xl flex flex-col gap-5 shadow-2xl">
 
-        <div className="text-center mb-8">
+        <h1 className="text-white text-4xl font-bold text-center">
+          HTML To APK Generator
+        </h1>
 
-          <h1 className="text-5xl font-black text-white mb-3">
-            HTML TO APK
-          </h1>
+        <p className="text-zinc-400 text-center">
+          Convert HTML into Android APK Online
+        </p>
 
-          <p className="text-zinc-400 text-lg">
-            Convert HTML into Android APK
-          </p>
+        <input
+          type="text"
+          placeholder="App Name"
+          value={appName}
+          onChange={(e) =>
+            setAppName(
+              e.target.value
+            )
+          }
+          className="bg-zinc-800 text-white p-4 rounded-2xl outline-none"
+        />
 
-        </div>
+        <input
+          type="text"
+          placeholder="Package Name (com.example.app)"
+          value={packageName}
+          onChange={(e) =>
+            setPackageName(
+              e.target.value
+            )
+          }
+          className="bg-zinc-800 text-white p-4 rounded-2xl outline-none"
+        />
 
-        <div className="space-y-5">
+        <textarea
+          placeholder="Paste HTML Code"
+          value={htmlCode}
+          onChange={(e) =>
+            setHtmlCode(
+              e.target.value
+            )
+          }
+          className="bg-zinc-800 text-white p-4 rounded-2xl outline-none h-64"
+        />
 
-          <input
-            type="text"
-            placeholder="App Name"
-            value={appName}
-            onChange={(e) =>
-              setAppName(
-                e.target.value
-              )
+        <input
+          type="file"
+          accept="image/png"
+          onChange={(e) => {
+
+            if (
+              e.target.files?.[0]
+            ) {
+
+              setIcon(
+                e.target.files[0]
+              );
             }
-            className="w-full bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl"
-          />
+          }}
+          className="bg-zinc-800 text-white p-4 rounded-2xl"
+        />
 
-          <input
-            type="text"
-            placeholder="Package Name"
-            value={packageName}
-            onChange={(e) =>
-              setPackageName(
-                e.target.value
-              )
-            }
-            className="w-full bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl"
-          />
+        <button
+          onClick={
+            generateAPK
+          }
+          disabled={loading}
+          className="bg-green-500 hover:bg-green-600 transition-all text-white font-bold p-4 rounded-2xl"
+        >
 
-          <textarea
-            placeholder="Paste HTML Code"
-            value={htmlCode}
-            onChange={(e) =>
-              setHtmlCode(
-                e.target.value
-              )
-            }
-            className="w-full h-80 bg-zinc-800 border border-zinc-700 text-white p-5 rounded-2xl"
-          />
+          {loading
+            ? "Processing..."
+            : "Generate APK"}
 
-          <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-5">
+        </button>
 
-            <p className="text-white font-bold mb-3">
-              Upload App Icon
-            </p>
+        {status && (
 
-            <input
-              type="file"
-              accept="image/png"
-              onChange={(e) => {
+          <div className="bg-zinc-800 text-zinc-300 text-center p-4 rounded-2xl">
 
-                if (
-                  e.target.files?.[0]
-                ) {
-
-                  setIcon(
-                    e.target.files[0]
-                  );
-                }
-              }}
-              className="text-white"
-            />
+            {status}
 
           </div>
 
-          <button
-            onClick={generateAPK}
-            disabled={loading}
-            className="w-full bg-green-500 hover:bg-green-600 transition-all text-white p-5 rounded-2xl font-black text-2xl"
+        )}
+
+        {downloadLink && (
+
+          <a
+            href={downloadLink}
+            target="_blank"
+            className="bg-blue-500 hover:bg-blue-600 transition-all text-white font-bold p-4 rounded-2xl text-center"
           >
+            Download APK
+          </a>
 
-            {loading
-              ? "Processing..."
-              : "Generate APK"}
-
-          </button>
-
-          {status && (
-
-            <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-5 text-center">
-
-              <p className="text-white text-lg font-bold">
-                {status}
-              </p>
-
-            </div>
-
-          )}
-
-          {downloadLink && (
-
-            <a
-              href={downloadLink}
-              target="_blank"
-              className="block w-full bg-blue-500 hover:bg-blue-600 transition-all text-center text-white p-5 rounded-2xl font-black text-2xl"
-            >
-              Download APK
-            </a>
-
-          )}
-
-        </div>
+        )}
 
       </div>
 
     </main>
-
   );
-
 }
