@@ -1,370 +1,362 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>গানের খাতা | দেওয়ান গোলজান আরফিন নাঈম</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #f43f5e;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Portfolio</title>
 
-        body {
-            font-family: 'Hind Siliguri', 'Inter', sans-serif;
-            background: #0f172a;
-            color: #f1f5f9;
-            overflow-x: hidden;
-        }
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      scroll-behavior:smooth;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-        .bg-mesh {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background-color: #0f172a;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(244, 63, 94, 0.1) 0px, transparent 50%);
-        }
+    body{
+      background:#0f172a;
+      color:white;
+      line-height:1.6;
+    }
 
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    a{
+      text-decoration:none;
+      color:white;
+    }
 
-        .glass-light {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    /* NAVBAR */
+    nav{
+      width:100%;
+      padding:20px 10%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:fixed;
+      top:0;
+      background:#0f172adf;
+      backdrop-filter: blur(10px);
+      z-index:1000;
+    }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .reveal { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    nav h1{
+      color:#38bdf8;
+    }
 
-        .lyrics-content {
-            line-height: 2.2;
-            letter-spacing: 0.02em;
-        }
+    nav ul{
+      display:flex;
+      gap:20px;
+      list-style:none;
+    }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+    nav ul li a:hover{
+      color:#38bdf8;
+    }
+
+    /* HERO */
+    .hero{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:0 10%;
+      gap:50px;
+      flex-wrap:wrap;
+    }
+
+    .hero-text{
+      max-width:500px;
+    }
+
+    .hero-text h2{
+      font-size:3rem;
+    }
+
+    .hero-text span{
+      color:#38bdf8;
+    }
+
+    .hero-text p{
+      margin:20px 0;
+      color:#cbd5e1;
+    }
+
+    .btn{
+      display:inline-block;
+      padding:12px 25px;
+      background:#38bdf8;
+      color:#0f172a;
+      border-radius:8px;
+      font-weight:bold;
+      transition:0.3s;
+    }
+
+    .btn:hover{
+      background:white;
+    }
+
+    .hero img{
+      width:300px;
+      border-radius:50%;
+      border:5px solid #38bdf8;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float{
+      0%,100%{
+        transform:translateY(0);
+      }
+      50%{
+        transform:translateY(-15px);
+      }
+    }
+
+    /* SECTION */
+    section{
+      padding:100px 10%;
+    }
+
+    .title{
+      text-align:center;
+      margin-bottom:50px;
+      font-size:2.5rem;
+      color:#38bdf8;
+    }
+
+    /* ABOUT */
+    .about{
+      text-align:center;
+      max-width:800px;
+      margin:auto;
+      color:#cbd5e1;
+    }
+
+    /* SKILLS */
+    .skills-container{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:20px;
+    }
+
+    .skill{
+      background:#1e293b;
+      padding:25px;
+      border-radius:10px;
+      text-align:center;
+      transition:0.3s;
+    }
+
+    .skill:hover{
+      transform:translateY(-8px);
+      background:#38bdf8;
+      color:#0f172a;
+    }
+
+    /* PROJECTS */
+    .projects{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:25px;
+    }
+
+    .project-card{
+      background:#1e293b;
+      padding:20px;
+      border-radius:10px;
+      transition:0.3s;
+    }
+
+    .project-card:hover{
+      transform:scale(1.03);
+    }
+
+    .project-card h3{
+      margin-bottom:10px;
+      color:#38bdf8;
+    }
+
+    /* CONTACT */
+    .contact{
+      text-align:center;
+    }
+
+    .contact form{
+      max-width:500px;
+      margin:auto;
+      display:flex;
+      flex-direction:column;
+      gap:15px;
+    }
+
+    .contact input,
+    .contact textarea{
+      padding:15px;
+      border:none;
+      border-radius:8px;
+      outline:none;
+    }
+
+    .contact button{
+      border:none;
+      cursor:pointer;
+    }
+
+    footer{
+      text-align:center;
+      padding:20px;
+      background:#020617;
+      color:#94a3b8;
+    }
+
+    /* Responsive */
+    @media(max-width:768px){
+      .hero-text h2{
+        font-size:2.2rem;
+      }
+
+      nav{
+        flex-direction:column;
+        gap:10px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="bg-mesh"></div>
 
-    <section id="intro-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950 transition-all duration-1000">
-        <div class="max-w-md w-full relative text-center">
-            <div class="relative glass rounded-[3rem] p-10 border border-white/10 shadow-2xl reveal">
-                <div class="relative mb-8 inline-block">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjtn_fhDo1nbNwkzoR5f4_G3gz621Ltda8Ycffdbwcn-rvEg_Gx7JxdH_vrHNThs71FkBF-avaUMFeGUVMVsRgCENQnukiqqlCgMSWxVOVC0RN2dT-lNo0B_7SjHaHkjRGQD0_7CzyOtkgju6PKthOtuD5iTzRSl8MakIgpoHUJwdApRQlhD0hczf9pwNo/s1600/Naim%20Mama.jpg" 
-                         alt="দেওয়ান গোলজান আরফিন নাঈম" 
-                         class="relative w-44 h-44 object-cover rounded-full border-4 border-indigo-500/30 shadow-2xl mx-auto">
-                </div>
-                <h2 class="text-indigo-400 font-bold uppercase tracking-[0.3em] text-xs mb-3">লিরিক্স আর্কাইভ</h2>
-                <h1 class="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">দেওয়ান গোলজান আরফিন নাঈম</h1>
-                <p class="text-slate-400 mb-10 text-lg font-light italic">"সুরের ভেলায় ভাসানো কিছু প্রিয় পংক্তিমালা"</p>
-                <button onclick="enterApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-5 px-8 rounded-2xl transition-all duration-300 active:scale-95">
-                    প্রবেশ করুন
-                </button>
-            </div>
-        </div>
-    </section>
+  <!-- NAVBAR -->
+  <nav>
+    <h1>MyPortfolio</h1>
 
-    <main id="app-main" class="hidden opacity-0 max-w-6xl mx-auto px-6 py-10 transition-all duration-1000">
-        <header class="flex flex-col md:flex-row items-center justify-between gap-8 mb-16 reveal">
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-black text-white">গানের খাতা</h1>
-                    <p class="text-slate-400 text-sm">সিঙ্ক মোড: এডিট ও ডিলিট সক্ষম</p>
-                </div>
-            </div>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-            <div class="relative w-full md:w-[400px]">
-                <input type="text" id="searchInput" onkeyup="handleSearch()"
-                    placeholder="টাইটেল দিয়ে গান খুঁজুন..." 
-                    class="w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl py-4 pl-12 pr-6 focus:outline-none focus:border-indigo-500 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </div>
-        </header>
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-text">
+      <h2>Hello, I'm <span>John Doe</span></h2>
+      <h3>Frontend Developer</h3>
 
-        <div id="loading-view" class="flex flex-col items-center justify-center py-20">
-            <div class="loading-spinner mb-4"></div>
-            <p class="text-slate-500">ডাটাবেস কানেক্ট হচ্ছে...</p>
-        </div>
+      <p>
+        I create modern and responsive websites using HTML,
+        CSS, and JavaScript.
+      </p>
 
-        <div id="song-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
-
-        <div id="no-results" class="hidden text-center py-20">
-            <p class="text-xl text-slate-500">কোনো গান পাওয়া যায়নি!</p>
-        </div>
-    </main>
-
-    <!-- Modal for Lyrics -->
-    <div id="lyrics-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-0 md:p-6">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onclick="closeLyrics()"></div>
-        <div class="relative glass w-full max-w-4xl h-full md:h-[90vh] md:rounded-[3rem] overflow-hidden flex flex-col reveal opacity-0">
-            <div class="sticky top-0 z-20 flex items-center justify-between p-6 md:p-10 bg-slate-900/50 border-b border-white/5">
-                <button onclick="closeLyrics()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-800 hover:bg-rose-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-                <h3 id="modal-title" class="text-xl md:text-3xl font-bold text-center flex-1 px-4 truncate text-white"></h3>
-                <button onclick="copyLyrics()" class="bg-indigo-600 px-6 py-3 rounded-2xl font-bold">কপি</button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-8 md:p-16 text-center">
-                <div id="modal-content" class="lyrics-content text-xl md:text-2xl text-slate-200 whitespace-pre-line italic"></div>
-            </div>
-        </div>
+      <a href="#projects" class="btn">View Projects</a>
     </div>
 
-    <!-- Admin/Edit Modal -->
-    <div id="admin-modal" class="fixed inset-0 z-[120] hidden flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xl rounded-3xl p-8 border border-white/10">
-            <h2 id="admin-modal-title" class="text-2xl font-bold mb-6 text-indigo-400">নতুন গান যোগ করুন</h2>
-            <input type="hidden" id="edit-id">
-            <div class="space-y-4">
-                <input type="text" id="new-title" placeholder="গানের টাইটেল" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-white focus:outline-none">
-                <textarea id="new-lyrics" rows="8" placeholder="লিরিক্স এখানে..." class="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-white focus:outline-none"></textarea>
-                <div class="flex gap-4">
-                    <button onclick="toggleAdmin()" class="flex-1 bg-slate-700 py-4 rounded-xl font-bold">বাতিল</button>
-                    <button id="save-btn" onclick="saveSong()" class="flex-1 bg-indigo-600 py-4 rounded-xl font-bold">সংরক্ষণ করুন</button>
-                </div>
-            </div>
-        </div>
+    <img src="https://i.pravatar.cc/300" alt="profile">
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <h2 class="title">About Me</h2>
+
+    <div class="about">
+      <p>
+        I'm a passionate web developer with experience building
+        responsive and interactive websites. I enjoy creating
+        beautiful UI designs and smooth user experiences.
+      </p>
     </div>
+  </section>
 
-    <!-- Confirmation Dialog -->
-    <div id="confirm-modal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-white/10 p-8 rounded-3xl max-w-sm w-full text-center">
-            <div class="w-16 h-16 bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">আপনি কি নিশ্চিত?</h3>
-            <p class="text-slate-400 mb-8">এই গানটি চিরতরে ডিলিট হয়ে যাবে।</p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirm()" class="flex-1 py-3 bg-slate-800 rounded-xl">না</button>
-                <button id="confirm-delete-btn" class="flex-1 py-3 bg-rose-600 rounded-xl font-bold">হ্যাঁ, ডিলিট</button>
-            </div>
-        </div>
+  <!-- SKILLS -->
+  <section id="skills">
+    <h2 class="title">Skills</h2>
+
+    <div class="skills-container">
+      <div class="skill">HTML5</div>
+      <div class="skill">CSS3</div>
+      <div class="skill">JavaScript</div>
+      <div class="skill">React</div>
+      <div class="skill">Bootstrap</div>
+      <div class="skill">GitHub</div>
     </div>
+  </section>
 
-    <button onclick="toggleAdmin()" class="fixed bottom-8 right-8 w-16 h-16 bg-indigo-600 text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 transition-transform">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-    </button>
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2 class="title">Projects</h2>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] pointer-events-none opacity-0 transition-all duration-500">
-        <div class="bg-indigo-600 text-white px-8 py-4 rounded-2xl shadow-2xl">
-            <span id="toast-text" class="font-bold"></span>
-        </div>
+    <div class="projects">
+      <div class="project-card">
+        <h3>Portfolio Website</h3>
+        <p>
+          Personal portfolio website with responsive design.
+        </p>
+      </div>
+
+      <div class="project-card">
+        <h3>E-Commerce UI</h3>
+        <p>
+          Shopping website interface using HTML CSS JavaScript.
+        </p>
+      </div>
+
+      <div class="project-card">
+        <h3>Weather App</h3>
+        <p>
+          Weather application using API integration.
+        </p>
+      </div>
     </div>
+  </section>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2 class="title">Contact Me</h2>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAo4w9yjCdDlTV0i8c1pR1a_BgYEzTGbJI",
-            authDomain: "movies30-e54ca.firebaseapp.com",
-            projectId: "movies30-e54ca",
-            appId: "1:620566304082:web:437903447c47ce8c62d68b"
-        };
+    <div class="contact">
+      <form id="contactForm">
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <textarea rows="5" placeholder="Your Message"></textarea>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = "naim-songs-app";
-        const songsCol = collection(db, 'artifacts', appId, 'public', 'data', 'songs');
+        <button class="btn" type="submit">Send Message</button>
+      </form>
 
-        let allSongs = [];
+      <p id="msg" style="margin-top:20px;color:#38bdf8;"></p>
+    </div>
+  </section>
 
-        window.enterApp = function() {
-            document.getElementById('intro-screen').classList.add('hidden');
-            const main = document.getElementById('app-main');
-            main.classList.remove('hidden');
-            setTimeout(() => main.classList.add('opacity-100'), 50);
-        };
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 John Doe | All Rights Reserved</p>
+  </footer>
 
-        // Initialize App
-        const init = async () => {
-            try {
-                await signInAnonymously(auth);
-                onSnapshot(songsCol, (snapshot) => {
-                    allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    allSongs.sort((a, b) => (a.title || "").localeCompare(b.title || "", 'bn'));
-                    renderGrid(allSongs);
-                    document.getElementById('loading-view').classList.add('hidden');
-                    document.getElementById('song-grid').classList.remove('hidden');
-                });
-            } catch (err) {
-                console.error(err);
-                showToast("সার্ভার কানেক্ট হতে পারছে না!");
-            }
-        };
-        init();
+  <script>
+    // Contact Form Demo
+    const form = document.getElementById("contactForm");
+    const msg = document.getElementById("msg");
 
-        function renderGrid(data) {
-            const grid = document.getElementById('song-grid');
-            if (data.length === 0) {
-                grid.classList.add('hidden');
-                document.getElementById('no-results').classList.remove('hidden');
-                return;
-            }
-            document.getElementById('no-results').classList.add('hidden');
-            grid.classList.remove('hidden');
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
 
-            grid.innerHTML = data.map((song, idx) => `
-                <div class="group relative glass-light rounded-3xl p-8 border border-white/5 hover:border-indigo-500/30 reveal" style="animation-delay: ${idx * 0.05}s">
-                    <div onclick="window.openLyrics('${song.id}')" class="cursor-pointer">
-                        <h3 class="text-xl font-bold text-white mb-6 line-clamp-2">${song.title}</h3>
-                    </div>
-                    
-                    <div class="flex items-center justify-between border-t border-white/5 pt-4">
-                        <div class="flex gap-2">
-                            <button onclick="window.editSong('${song.id}')" class="p-3 bg-slate-800 hover:bg-indigo-600 rounded-xl transition-all" title="Edit">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </button>
-                            <button onclick="window.confirmDelete('${song.id}')" class="p-3 bg-slate-800 hover:bg-rose-600 rounded-xl transition-all" title="Delete">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                        </div>
-                        <span onclick="window.openLyrics('${song.id}')" class="text-xs font-bold text-indigo-400 cursor-pointer uppercase">বিস্তারিত →</span>
-                    </div>
-                </div>
-            `).join('');
-        }
+      msg.innerText = "Message Sent Successfully!";
+      form.reset();
 
-        window.saveSong = async function() {
-            const title = document.getElementById('new-title').value.trim();
-            const lyrics = document.getElementById('new-lyrics').value.trim();
-            const editId = document.getElementById('edit-id').value;
-            const btn = document.getElementById('save-btn');
+      setTimeout(() => {
+        msg.innerText = "";
+      }, 3000);
+    });
 
-            if (!title || !lyrics) return showToast("সব তথ্য দিন!");
+    // Navbar shadow on scroll
+    window.addEventListener("scroll", () => {
+      const nav = document.querySelector("nav");
 
-            try {
-                btn.disabled = true;
-                btn.innerText = "প্রসেসিং...";
-                
-                if (editId) {
-                    const songRef = doc(db, 'artifacts', appId, 'public', 'data', 'songs', editId);
-                    await updateDoc(songRef, { title, lyrics, updatedAt: serverTimestamp() });
-                    showToast("সফলভাবে আপডেট হয়েছে!");
-                } else {
-                    await addDoc(songsCol, { title, lyrics, createdAt: serverTimestamp() });
-                    showToast("নতুন গান যোগ হয়েছে!");
-                }
-                
-                toggleAdmin();
-            } catch (e) {
-                console.error(e);
-                showToast("ত্রুটি হয়েছে!");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "সংরক্ষণ করুন";
-            }
-        };
+      if(window.scrollY > 50){
+        nav.style.boxShadow = "0 2px 10px rgba(0,0,0,0.5)";
+      } else {
+        nav.style.boxShadow = "none";
+      }
+    });
+  </script>
 
-        window.confirmDelete = function(id) {
-            const modal = document.getElementById('confirm-modal');
-            const btn = document.getElementById('confirm-delete-btn');
-            modal.classList.remove('hidden');
-            btn.onclick = async () => {
-                try {
-                    const songRef = doc(db, 'artifacts', appId, 'public', 'data', 'songs', id);
-                    await deleteDoc(songRef);
-                    showToast("গানটি ডিলিট করা হয়েছে");
-                    closeConfirm();
-                } catch (e) {
-                    showToast("ডিলিট করা যায়নি");
-                }
-            };
-        };
-
-        window.editSong = function(id) {
-            const song = allSongs.find(s => s.id === id);
-            if (!song) return;
-            document.getElementById('edit-id').value = id;
-            document.getElementById('new-title').value = song.title;
-            document.getElementById('new-lyrics').value = song.lyrics;
-            document.getElementById('admin-modal-title').innerText = "গান এডিট করুন";
-            toggleAdmin();
-        };
-
-        window.toggleAdmin = function() {
-            const modal = document.getElementById('admin-modal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-                document.getElementById('edit-id').value = '';
-                document.getElementById('new-title').value = '';
-                document.getElementById('new-lyrics').value = '';
-                document.getElementById('admin-modal-title').innerText = "নতুন গান যোগ করুন";
-            }
-        };
-
-        window.handleSearch = function() {
-            const q = document.getElementById('searchInput').value.toLowerCase().trim();
-            const filtered = allSongs.filter(s => s.title.toLowerCase().includes(q) || s.lyrics.toLowerCase().includes(q));
-            renderGrid(filtered);
-        };
-
-        window.openLyrics = function(id) {
-            const song = allSongs.find(s => s.id === id);
-            document.getElementById('modal-title').innerText = song.title;
-            document.getElementById('modal-content').innerText = song.lyrics;
-            const modal = document.getElementById('lyrics-modal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.querySelector('.reveal').classList.replace('opacity-0', 'opacity-100'), 10);
-        };
-
-        window.closeLyrics = () => document.getElementById('lyrics-modal').classList.add('hidden');
-        window.closeConfirm = () => document.getElementById('confirm-modal').classList.add('hidden');
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-text').innerText = msg;
-            toast.classList.replace('opacity-0', 'opacity-100');
-            setTimeout(() => toast.classList.replace('opacity-100', 'opacity-0'), 3000);
-        }
-
-        window.copyLyrics = function() {
-            const t = document.getElementById('modal-title').innerText;
-            const c = document.getElementById('modal-content').innerText;
-            const txt = `${t}\n\n${c}\n\n— সংকলক: দেওয়ান গোলজান আরফিন নাঈম`;
-            const el = document.createElement('textarea');
-            el.value = txt;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast("কপি করা হয়েছে!");
-        };
-    </script>
 </body>
 </html>
