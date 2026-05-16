@@ -2,8 +2,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.rabbinew.app",
-  appName: "Rabbinew",
+  appId: "com.rabbisr.app",
+  appName: "rabbiq",
   webDir: "public",
 
   plugins: {
