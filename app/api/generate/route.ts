@@ -197,7 +197,7 @@ const config: CapacitorConfig = {
 
   appName: "${appName}",
 
-  webDir: ".next",
+  webDir: "public",
 
   server: {
     androidScheme: "https"
