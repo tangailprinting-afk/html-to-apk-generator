@@ -1,50 +1,172 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+
+<meta charset="UTF-8" />
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>
+NATIVE TEST
+</title>
+
+<style>
+
+body {
+
+  font-family: sans-serif;
+
+  background: #111;
+
+  color: white;
+
+  padding: 20px;
+}
+
+button {
+
+  width: 100%;
+
+  padding: 15px;
+
+  margin-bottom: 10px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #333;
+
+  color: white;
+
+  font-size: 18px;
+}
+
+</style>
+
+</head>
+
 <body>
 
 <h1>
-RUNTIME TEST
+REAL NATIVE TEST
 </h1>
 
 <button onclick="testStorage()">
 TEST STORAGE
 </button>
 
-<button onclick="testDB()">
+<button onclick="testSQLite()">
 TEST SQLITE
+</button>
+
+<button onclick="testShare()">
+TEST SHARE
+</button>
+
+<button onclick="testDevice()">
+TEST DEVICE
+</button>
+
+<button onclick="testNetwork()">
+TEST NETWORK
 </button>
 
 <script>
 
 async function testStorage() {
 
-  await window.parent.AndroidStorage.save(
-    "test.txt",
-    "HELLO"
-  );
+  try {
 
-  const data =
-    await window.parent.AndroidStorage.read(
-      "test.txt"
+    await window.parent.AndroidStorage.save(
+      "test.txt",
+      "HELLO STORAGE"
     );
 
-  alert(data);
+    const data =
+      await window.parent.AndroidStorage.read(
+        "test.txt"
+      );
+
+    alert(data);
+
+  } catch (error) {
+
+    alert(error);
+  }
 }
 
-async function testDB() {
+async function testSQLite() {
 
-  await window.parent.AndroidDB.addNote(
-    "Cash",
-    "500"
-  );
+  try {
 
-  const notes =
-    await window.parent.AndroidDB.getNotes();
+    await window.parent.AndroidDB.addNote(
+      "Cash",
+      "500"
+    );
 
-  alert(
-    JSON.stringify(notes)
-  );
+    const notes =
+      await window.parent.AndroidDB.getNotes();
+
+    alert(
+      JSON.stringify(notes)
+    );
+
+  } catch (error) {
+
+    alert(error);
+  }
+}
+
+async function testShare() {
+
+  try {
+
+    await window.parent.AndroidShare.share(
+      "Hello",
+      "Native Share Test"
+    );
+
+  } catch (error) {
+
+    alert(error);
+  }
+}
+
+async function testDevice() {
+
+  try {
+
+    const info =
+      await window.parent.AndroidDevice.getInfo();
+
+    alert(
+      JSON.stringify(info)
+    );
+
+  } catch (error) {
+
+    alert(error);
+  }
+}
+
+async function testNetwork() {
+
+  try {
+
+    const online =
+      await window.parent.AndroidNetwork.isOnline();
+
+    alert(online);
+
+  } catch (error) {
+
+    alert(error);
+  }
 }
 
 </script>

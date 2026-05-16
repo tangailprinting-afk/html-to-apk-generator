@@ -42,81 +42,6 @@ export async function POST(
         "zipFile"
       ) as File;
 
-const features =
-  JSON.parse(
-    formData.get(
-      "features"
-    ) as string
-  );
-
-    // ANDROID SDK
-
-
-
-const androidSDK =
-`
-<script type="module" src="runtime.js"></script>
-
-<script>
-
-window.APP_FEATURES =
-${JSON.stringify(features)};
-
-window.APP_PACKAGE =
-"${packageName}";
-
-</script>
-`;
-
-
-
-
-
-
-    // ONESIGNAL SCRIPT
-
-const oneSignalScript =
-features.onesignal
-?
-`
-<script type="module">
-
-import {
-  OneSignal
-}
-from
-'https://esm.sh/@onesignal/capacitor-plugin';
-
-window.addEventListener(
-  'DOMContentLoaded',
-  async () => {
-
-    try {
-
-      await OneSignal.initialize(
-        "cf9a26bb-42ee-439b-a8d1-bb3ca6ca6d06"
-      );
-
-      OneSignal.Notifications.requestPermission(
-        true
-      );
-
-      console.log(
-        "OneSignal Ready"
-      );
-
-    } catch (error) {
-
-      console.log(error);
-    }
-  }
-);
-
-</script>
-`
-:
-"";
-
     // VALIDATE PACKAGE
 
     const validPackage =
@@ -169,44 +94,13 @@ window.addEventListener(
         const fileData =
           entry.getData();
 
-        let finalData =
-          fileData;
-
-        // AUTO INSERT SDK
-
-        if (
-          fileName ===
-          "index.html"
-        ) {
-
-          const html =
-            fileData.toString(
-              "utf8"
-            );
-
-          const updatedHtml =
-            html.replace(
-              "</body>",
-              `
-${androidSDK}
-${oneSignalScript}
-</body>
-`
-            );
-
-          finalData =
-            Buffer.from(
-              updatedHtml
-            );
-        }
-
         const base64 =
-          finalData.toString(
+          fileData.toString(
             "base64"
           );
 
         await uploadBinaryFile(
-          `public/${fileName}`,
+          `public/generated/${fileName}`,
           base64,
           `updated ${fileName}`
         );
@@ -216,19 +110,9 @@ ${oneSignalScript}
 
       // NORMAL HTML
 
-      const finalHtml =
-        htmlCode.replace(
-          "</body>",
-`
-${androidSDK}
-${oneSignalScript}
-</body>
-`
-        );
-
       await updateGitHubFile(
-        "public/app.html",
-        finalHtml,
+        "public/generated/index.html",
+        htmlCode,
         "updated html"
       );
     }
@@ -254,7 +138,7 @@ ${oneSignalScript}
 
     // UPDATE STRINGS
 
-const strings =
+    const strings =
 `<?xml version="1.0" encoding="utf-8"?>
 <resources>
 <string name="app_name">${appName}</string>
@@ -308,14 +192,23 @@ const strings =
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
+
   appId: "${packageName}",
+
   appName: "${appName}",
-  webDir: "public",
+
+  webDir: ".next",
+
+  server: {
+    androidScheme: "https"
+  },
 
   plugins: {
+
     OneSignal: {
+
       appId:
-        "cf9a26bb-42ee-439b-a8d1-bb3ca6ca6d06",
+"cf9a26bb-42ee-439b-a8d1-bb3ca6ca6d06",
     },
   },
 };
@@ -335,7 +228,9 @@ export default config;
       await triggerWorkflow();
 
     return NextResponse.json({
+
       success: true,
+
       runId,
     });
 

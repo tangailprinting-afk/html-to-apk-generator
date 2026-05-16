@@ -4,7 +4,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 const config: CapacitorConfig = {
   appId: "com.habibi.app",
   appName: "habib",
-  webDir: "public",
+  webDir: ".next",
 
   plugins: {
     OneSignal: {
