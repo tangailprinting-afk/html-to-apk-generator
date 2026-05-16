@@ -1,8 +1,9 @@
+
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.dynamic.app",
-  appName: "HTML APK",
+  appId: "com.newnew.app",
+  appName: "new",
   webDir: "public",
 
   plugins: {
