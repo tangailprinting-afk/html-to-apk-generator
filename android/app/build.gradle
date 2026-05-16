@@ -4,7 +4,7 @@ android {
     namespace "com.htmlapk.generator"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.newnew.app"
+        applicationId "com.eewrewr.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
