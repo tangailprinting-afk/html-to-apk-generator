@@ -27,6 +27,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Generate Capacitor Assets
+        run: npx capacitor-assets generate
+
       - name: Sync Capacitor
         run: npx cap sync android
 

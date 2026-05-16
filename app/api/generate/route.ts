@@ -42,36 +42,73 @@ export async function POST(
         "zipFile"
       ) as File;
 
-    // ONESIGNAL SCRIPT
+const features =
+  JSON.parse(
+    formData.get(
+      "features"
+    ) as string
+  );
 
-    const oneSignalScript =
+    // ANDROID SDK
+
+const androidSDK =
 `
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"></script>
+<script src="/android-sdk.js"></script>
 
 <script>
 
-window.OneSignalDeferred =
-  window.OneSignalDeferred || [];
+window.APP_FEATURES =
+${JSON.stringify(features)};
+window.APP_PACKAGE =
+"${packageName}";
 
-OneSignalDeferred.push(
-  async function (OneSignal) {
 
-    await OneSignal.init({
+</script>
+`;
 
-      appId:
-        "cf9a26bb-42ee-439b-a8d1-bb3ca6ca6d06",
+    // ONESIGNAL SCRIPT
 
-      notifyButton: {
-        enable: true,
-      },
+const oneSignalScript =
+features.onesignal
+?
+`
+<script type="module">
 
-      allowLocalhostAsSecureOrigin: true,
-    });
+import {
+  OneSignal
+}
+from
+'https://esm.sh/@onesignal/capacitor-plugin';
+
+window.addEventListener(
+  'DOMContentLoaded',
+  async () => {
+
+    try {
+
+      await OneSignal.initialize(
+        "cf9a26bb-42ee-439b-a8d1-bb3ca6ca6d06"
+      );
+
+      OneSignal.Notifications.requestPermission(
+        true
+      );
+
+      console.log(
+        "OneSignal Ready"
+      );
+
+    } catch (error) {
+
+      console.log(error);
+    }
   }
 );
 
 </script>
-`;
+`
+:
+"";
 
     // VALIDATE PACKAGE
 
@@ -128,7 +165,7 @@ OneSignalDeferred.push(
         let finalData =
           fileData;
 
-        // AUTO INSERT ONESIGNAL
+        // AUTO INSERT SDK
 
         if (
           fileName ===
@@ -143,7 +180,11 @@ OneSignalDeferred.push(
           const updatedHtml =
             html.replace(
               "</body>",
-              `${oneSignalScript}</body>`
+              `
+${androidSDK}
+${oneSignalScript}
+</body>
+`
             );
 
           finalData =
@@ -171,7 +212,11 @@ OneSignalDeferred.push(
       const finalHtml =
         htmlCode.replace(
           "</body>",
-          `${oneSignalScript}</body>`
+`
+${androidSDK}
+${oneSignalScript}
+</body>
+`
         );
 
       await updateGitHubFile(
@@ -202,8 +247,8 @@ OneSignalDeferred.push(
 
     // UPDATE STRINGS
 
-    const strings =
-      `<?xml version='1.0' encoding='utf-8'?>
+const strings =
+`<?xml version="1.0" encoding="utf-8"?>
 <resources>
 <string name="app_name">${appName}</string>
 <string name="title_activity_main">${appName}</string>

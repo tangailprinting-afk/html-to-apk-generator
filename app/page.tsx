@@ -19,7 +19,21 @@ export default function Home() {
     useState<File | null>(null);
     const [zipFile, setZipFile] =
   useState<File | null>(null);
+const [features, setFeatures] =
+  useState({
 
+    onesignal: true,
+
+    storage: true,
+
+    sqlite: false,
+
+    share: false,
+
+    network: false,
+
+    device: false,
+  });
   const [
     downloadLink,
     setDownloadLink,
@@ -74,6 +88,10 @@ export default function Home() {
     zipFile
   );
 }
+formData.append(
+  "features",
+  JSON.stringify(features)
+);
 
         const response =
           await fetch(
@@ -286,6 +304,152 @@ export default function Home() {
   }}
   className="bg-zinc-800 text-white p-4 rounded-2xl"
 />
+
+
+<div className="flex flex-col gap-3 text-white">
+
+<label className="flex items-center gap-2">
+
+<input
+  type="checkbox"
+
+  checked={
+    features.onesignal
+  }
+
+  onChange={(e) =>
+    setFeatures({
+      ...features,
+
+      onesignal:
+        e.target.checked,
+    })
+  }
+/>
+
+OneSignal
+
+</label>
+
+<label className="flex items-center gap-2">
+
+<input
+  type="checkbox"
+
+  checked={
+    features.storage
+  }
+
+  onChange={(e) =>
+    setFeatures({
+      ...features,
+
+      storage:
+        e.target.checked,
+    })
+  }
+/>
+
+Storage
+
+</label>
+
+<label className="flex items-center gap-2">
+
+<input
+  type="checkbox"
+
+  checked={
+    features.sqlite
+  }
+
+  onChange={(e) =>
+    setFeatures({
+      ...features,
+
+      sqlite:
+        e.target.checked,
+    })
+  }
+/>
+
+SQLite
+
+</label>
+
+<label className="flex items-center gap-2">
+
+<input
+  type="checkbox"
+
+  checked={
+    features.share
+  }
+
+  onChange={(e) =>
+    setFeatures({
+      ...features,
+
+      share:
+        e.target.checked,
+    })
+  }
+/>
+
+Share
+
+</label>
+
+<label className="flex items-center gap-2">
+
+<input
+  type="checkbox"
+
+  checked={
+    features.network
+  }
+
+  onChange={(e) =>
+    setFeatures({
+      ...features,
+
+      network:
+        e.target.checked,
+    })
+  }
+/>
+
+Network
+
+</label>
+
+<label className="flex items-center gap-2">
+
+<input
+  type="checkbox"
+
+  checked={
+    features.device
+  }
+
+  onChange={(e) =>
+    setFeatures({
+      ...features,
+
+      device:
+        e.target.checked,
+    })
+  }
+/>
+
+Device
+
+</label>
+
+</div>
+
+
+
 
 
         <button
