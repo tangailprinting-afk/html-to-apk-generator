@@ -1,22 +1,16 @@
-import type {
-  CapacitorConfig
-} from "@capacitor/cli";
+
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
 
-  appId:
-    "com.rabbi.app",
+  appId: "com.uuu.app",
 
-  appName:
-    "Rabbi App",
+  appName: "uuu",
 
-  webDir:
-    "public",
+  webDir: "public",
 
   server: {
-
-    androidScheme:
-      "https",
+    androidScheme: "https"
   },
 
   plugins: {
