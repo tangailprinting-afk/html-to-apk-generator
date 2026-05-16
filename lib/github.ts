@@ -103,3 +103,28 @@ export async function getWorkflowStatus(
 
   return data;
 }
+export async function uploadBinaryFile(
+  path: string,
+  base64Content: string,
+  message: string
+) {
+
+  const sha =
+    await getFileSha(path);
+
+  await fetch(
+    `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${path}`,
+    {
+      method: "PUT",
+
+      headers,
+
+      body: JSON.stringify({
+        message,
+        content:
+          base64Content,
+        sha,
+      }),
+    }
+  );
+}

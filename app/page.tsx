@@ -17,6 +17,8 @@ export default function Home() {
 
   const [icon, setIcon] =
     useState<File | null>(null);
+    const [zipFile, setZipFile] =
+  useState<File | null>(null);
 
   const [
     downloadLink,
@@ -65,6 +67,13 @@ export default function Home() {
             icon
           );
         }
+        if (zipFile) {
+
+  formData.append(
+    "zipFile",
+    zipFile
+  );
+}
 
         const response =
           await fetch(
@@ -260,6 +269,24 @@ export default function Home() {
           }}
           className="bg-zinc-800 text-white p-4 rounded-2xl"
         />
+
+<input
+  type="file"
+  accept=".zip"
+  onChange={(e) => {
+
+    if (
+      e.target.files?.[0]
+    ) {
+
+      setZipFile(
+        e.target.files[0]
+      );
+    }
+  }}
+  className="bg-zinc-800 text-white p-4 rounded-2xl"
+/>
+
 
         <button
           onClick={
