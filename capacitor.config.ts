@@ -2,8 +2,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.sabur.app",
-  appName: "Ab Sabur",
+  appId: "com.myapp.app",
+  appName: "my app",
   webDir: "public",
 };
 
