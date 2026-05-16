@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<h1>
+RUNTIME TEST
+</h1>
+
+<button onclick="testStorage()">
+TEST STORAGE
+</button>
+
+<button onclick="testDB()">
+TEST SQLITE
+</button>
+
+<script>
+
+async function testStorage() {
+
+  await window.parent.AndroidStorage.save(
+    "test.txt",
+    "HELLO"
+  );
+
+  const data =
+    await window.parent.AndroidStorage.read(
+      "test.txt"
+    );
+
+  alert(data);
+}
+
+async function testDB() {
+
+  await window.parent.AndroidDB.addNote(
+    "Cash",
+    "500"
+  );
+
+  const notes =
+    await window.parent.AndroidDB.getNotes();
+
+  alert(
+    JSON.stringify(notes)
+  );
+}
+
+</script>
+
+</body>
+</html>

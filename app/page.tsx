@@ -1,495 +1,172 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  initBridge
+} from "@/src/runtime/bridge";
+
+import {
+  checkLicense
+} from "@/src/runtime/license";
 
 export default function Home() {
 
-  const [appName, setAppName] =
-    useState("");
+  const [
+    ready,
+    setReady
+  ] = useState(false);
 
   const [
-    packageName,
-    setPackageName,
-  ] = useState("");
+    blocked,
+    setBlocked
+  ] = useState(false);
 
-  const [htmlCode, setHtmlCode] =
-    useState("");
+  useEffect(() => {
 
-  const [icon, setIcon] =
-    useState<File | null>(null);
-    const [zipFile, setZipFile] =
-  useState<File | null>(null);
-const [features, setFeatures] =
-  useState({
-
-    onesignal: true,
-
-    storage: true,
-
-    sqlite: false,
-
-    share: false,
-
-    network: false,
-
-    device: false,
-  });
-  const [
-    downloadLink,
-    setDownloadLink,
-  ] = useState("");
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [status, setStatus] =
-    useState("");
-
-  const generateAPK =
-    async () => {
+    async function start() {
 
       try {
 
-        setLoading(true);
+        // INIT NATIVE BRIDGE
 
-        setStatus(
-          "Uploading Files..."
-        );
+        await initBridge();
 
-        const formData =
-          new FormData();
+        // PACKAGE NAME
 
-        formData.append(
-          "appName",
-          appName
-        );
+        const packageName =
+          "com.rabbi.app";
 
-        formData.append(
-          "packageName",
-          packageName
-        );
+        // CHECK LICENSE
 
-        formData.append(
-          "htmlCode",
-          htmlCode
-        );
-
-        if (icon) {
-
-          formData.append(
-            "icon",
-            icon
-          );
-        }
-        if (zipFile) {
-
-  formData.append(
-    "zipFile",
-    zipFile
-  );
-}
-formData.append(
-  "features",
-  JSON.stringify(features)
-);
-
-        const response =
-          await fetch(
-            "/api/generate",
-            {
-              method: "POST",
-              body: formData,
-            }
+        const active =
+          await checkLicense(
+            packageName
           );
 
-        const data =
-          await response.json();
+        if (!active) {
 
-        if (!data.success) {
-
-          alert(
-            data.error
+          setBlocked(
+            true
           );
-
-          setLoading(false);
 
           return;
         }
 
-        const runId =
-          data.runId;
-
-        setStatus(
-          "Starting Cloud Build..."
+        setReady(
+          true
         );
-
-        let completed =
-          false;
-
-        while (!completed) {
-
-          await new Promise(
-            (resolve) =>
-              setTimeout(
-                resolve,
-                5000
-              )
-          );
-
-          const statusResponse =
-            await fetch(
-              `/api/status?runId=${runId}`
-            );
-
-          const statusData =
-            await statusResponse.json();
-
-          // QUEUED
-
-          if (
-            statusData.status ===
-            "queued"
-          ) {
-
-            setStatus(
-              "Build Queued..."
-            );
-
-            continue;
-          }
-
-          // BUILDING
-
-          if (
-            statusData.status ===
-            "building"
-          ) {
-
-            setStatus(
-              "Building APK... Please wait 2-3 minutes..."
-            );
-
-            continue;
-          }
-
-          // FAILED
-
-          if (
-            statusData.status ===
-            "failed"
-          ) {
-
-            alert(
-              "APK Build Failed"
-            );
-
-            setLoading(false);
-
-            return;
-          }
-
-          // SUCCESS
-
-          if (
-            statusData.status ===
-            "completed"
-          ) {
-
-            setStatus(
-              "APK Ready"
-            );
-
-            setDownloadLink(
-              statusData.downloadUrl
-            );
-
-            completed =
-              true;
-          }
-        }
-
-        setLoading(false);
 
       } catch (error) {
 
         console.log(error);
-
-        alert(
-          "Something went wrong"
-        );
-
-        setLoading(false);
       }
-    };
+    }
+
+    start();
+
+  }, []);
+
+  // LOCK SCREEN
+
+  if (blocked) {
+
+    return (
+
+      <div
+        style={{
+
+          width: "100vw",
+
+          height: "100vh",
+
+          background: "#000",
+
+          color: "#fff",
+
+          display: "flex",
+
+          justifyContent:
+            "center",
+
+          alignItems:
+            "center",
+
+          flexDirection:
+            "column",
+
+          fontFamily:
+            "sans-serif",
+        }}
+      >
+
+        <h1>
+          PAYMENT REQUIRED
+        </h1>
+
+        <p>
+          Please Contact Developer
+        </p>
+
+      </div>
+    );
+  }
+
+  // LOADING
+
+  if (!ready) {
+
+    return (
+
+      <div
+        style={{
+
+          width: "100vw",
+
+          height: "100vh",
+
+          display: "flex",
+
+          justifyContent:
+            "center",
+
+          alignItems:
+            "center",
+
+          fontSize: "22px",
+
+          fontFamily:
+            "sans-serif",
+        }}
+      >
+
+        Initializing Runtime...
+
+      </div>
+    );
+  }
+
+  // GENERATED APP
 
   return (
 
-    <main className="min-h-screen bg-black flex items-center justify-center p-5">
+    <iframe
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 w-full max-w-xl flex flex-col gap-5 shadow-2xl">
+      src="/generated/index.html"
 
-        <h1 className="text-white text-4xl font-bold text-center">
-          HTML To APK Generator
-        </h1>
+      style={{
 
-        <p className="text-zinc-400 text-center">
-          Convert HTML into Android APK Online
-        </p>
+        width: "100vw",
 
-        <input
-          type="text"
-          placeholder="App Name"
-          value={appName}
-          onChange={(e) =>
-            setAppName(
-              e.target.value
-            )
-          }
-          className="bg-zinc-800 text-white p-4 rounded-2xl outline-none"
-        />
+        height: "100vh",
 
-        <input
-          type="text"
-          placeholder="Package Name (com.example.app)"
-          value={packageName}
-          onChange={(e) =>
-            setPackageName(
-              e.target.value
-            )
-          }
-          className="bg-zinc-800 text-white p-4 rounded-2xl outline-none"
-        />
+        border: "none",
+      }}
 
-        <textarea
-          placeholder="Paste HTML Code"
-          value={htmlCode}
-          onChange={(e) =>
-            setHtmlCode(
-              e.target.value
-            )
-          }
-          className="bg-zinc-800 text-white p-4 rounded-2xl outline-none h-64"
-        />
+    />
 
-        <input
-          type="file"
-          accept="image/png"
-          onChange={(e) => {
-
-            if (
-              e.target.files?.[0]
-            ) {
-
-              setIcon(
-                e.target.files[0]
-              );
-            }
-          }}
-          className="bg-zinc-800 text-white p-4 rounded-2xl"
-        />
-
-<input
-  type="file"
-  accept=".zip"
-  onChange={(e) => {
-
-    if (
-      e.target.files?.[0]
-    ) {
-
-      setZipFile(
-        e.target.files[0]
-      );
-    }
-  }}
-  className="bg-zinc-800 text-white p-4 rounded-2xl"
-/>
-
-
-<div className="flex flex-col gap-3 text-white">
-
-<label className="flex items-center gap-2">
-
-<input
-  type="checkbox"
-
-  checked={
-    features.onesignal
-  }
-
-  onChange={(e) =>
-    setFeatures({
-      ...features,
-
-      onesignal:
-        e.target.checked,
-    })
-  }
-/>
-
-OneSignal
-
-</label>
-
-<label className="flex items-center gap-2">
-
-<input
-  type="checkbox"
-
-  checked={
-    features.storage
-  }
-
-  onChange={(e) =>
-    setFeatures({
-      ...features,
-
-      storage:
-        e.target.checked,
-    })
-  }
-/>
-
-Storage
-
-</label>
-
-<label className="flex items-center gap-2">
-
-<input
-  type="checkbox"
-
-  checked={
-    features.sqlite
-  }
-
-  onChange={(e) =>
-    setFeatures({
-      ...features,
-
-      sqlite:
-        e.target.checked,
-    })
-  }
-/>
-
-SQLite
-
-</label>
-
-<label className="flex items-center gap-2">
-
-<input
-  type="checkbox"
-
-  checked={
-    features.share
-  }
-
-  onChange={(e) =>
-    setFeatures({
-      ...features,
-
-      share:
-        e.target.checked,
-    })
-  }
-/>
-
-Share
-
-</label>
-
-<label className="flex items-center gap-2">
-
-<input
-  type="checkbox"
-
-  checked={
-    features.network
-  }
-
-  onChange={(e) =>
-    setFeatures({
-      ...features,
-
-      network:
-        e.target.checked,
-    })
-  }
-/>
-
-Network
-
-</label>
-
-<label className="flex items-center gap-2">
-
-<input
-  type="checkbox"
-
-  checked={
-    features.device
-  }
-
-  onChange={(e) =>
-    setFeatures({
-      ...features,
-
-      device:
-        e.target.checked,
-    })
-  }
-/>
-
-Device
-
-</label>
-
-</div>
-
-
-
-
-
-        <button
-          onClick={
-            generateAPK
-          }
-          disabled={loading}
-          className="bg-green-500 hover:bg-green-600 transition-all text-white font-bold p-4 rounded-2xl"
-        >
-
-          {loading
-            ? "Processing..."
-            : "Generate APK"}
-
-        </button>
-
-        {status && (
-
-          <div className="bg-zinc-800 text-zinc-300 text-center p-4 rounded-2xl">
-
-            {status}
-
-          </div>
-
-        )}
-
-        {downloadLink && (
-
-          <a
-            href={downloadLink}
-            target="_blank"
-            className="bg-blue-500 hover:bg-blue-600 transition-all text-white font-bold p-4 rounded-2xl text-center"
-          >
-            Download APK
-          </a>
-
-        )}
-
-      </div>
-
-    </main>
   );
 }

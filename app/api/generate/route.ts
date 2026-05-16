@@ -51,20 +51,27 @@ const features =
 
     // ANDROID SDK
 
+
+
 const androidSDK =
 `
-<script src="/android-sdk.js"></script>
+<script type="module" src="runtime.js"></script>
 
 <script>
 
 window.APP_FEATURES =
 ${JSON.stringify(features)};
+
 window.APP_PACKAGE =
 "${packageName}";
 
-
 </script>
 `;
+
+
+
+
+
 
     // ONESIGNAL SCRIPT
 
