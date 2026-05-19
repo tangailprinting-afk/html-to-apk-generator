@@ -3,9 +3,9 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
 
-  appId: "com.uuu.app",
+  appId: "com.sfsfd.app",
 
-  appName: "uuu",
+  appName: "com.sfsfd.app",
 
   webDir: "public",
 
